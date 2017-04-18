@@ -7,7 +7,6 @@ import tarfile
 import numpy as np
 import cv2
 
-
 class DeconvNet:
     def __init__(self, use_cpu=False, checkpoint_dir='./checkpoints/'):
         self.maybe_download_and_extract()
@@ -55,7 +54,7 @@ class DeconvNet:
         return self.prediction.eval(session=self.session, feed_dict={image: [image]})[0]
 
 
-    def train(self, train_stage=1, training_steps=1000, restore_session=False, learning_rate=1e-6):
+    def train(self, train_stage=1, training_steps=1000000, restore_session=False, learning_rate=1e-6):
         if restore_session:
             step_start = restore_session()
         else:
@@ -79,7 +78,7 @@ class DeconvNet:
             start = time.time()
             self.train_step.run(session=self.session, feed_dict={self.x: [image], self.y: [ground_truth], self.rate: learning_rate})
 
-            if i % 10000 == 0:
+            if i % 100 == 0:
                 print('step {} finished in {:.2f} s with loss of {:.6f}'.format(
                     i, time.time() - start, self.loss.eval(session=self.session, feed_dict={self.x: [image], self.y: [ground_truth]})))
                 self.saver.save(self.session, self.checkpoint_dir+'model', global_step=i)
